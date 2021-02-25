@@ -1,40 +1,39 @@
 const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
-require("dotenv").config();
+const compression = require("compression");
+const path = require("path");
+require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST;
-const DB = process.env.DB;
-
-
 
 const app = express();
 
 app.use(logger("dev"));
 
+app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("public"));
+
 mongoose.connect(
-    process.env.MONGODB_URI || `mongodb://${HOST}/${DB}`,
+    process.env.MONGODB_URI || 'mongodb://localhost/budget',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
-        useFindAndModify: false,
+        useFindAndModify: false
     }
 );
 
-// `
-// 
-//Routes
-require("./routes/api-routes")(app);
-require("./routes/html-routes")(app);
+// routes
+app.use(require("./routes/api.js"));
 
 app.listen(PORT, () => {
-    console.log(`App running on port ${PORT}!`);
+    console.log(
+        "==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.",
+        PORT,
+        PORT
+    );
 });
-
-module.exports = app;
